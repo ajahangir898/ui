@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Star } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { Product } from '../types';
 
@@ -12,17 +12,18 @@ interface DealOfTheDayProps {
 
 const DealOfTheDay: React.FC<DealOfTheDayProps> = ({ products, onProductClick, onAddToCart }) => {
   return (
-    <section className="container mx-auto mt-4 px-4">
-      <div className="flex justify-between items-end mb-3 md:mb-5">
-        <div className="border-b-2 border-pink-500 pb-0.5">
-          <h2 className="text-base md:text-xl font-bold text-gray-800">Deal of The Day</h2>
+    <section className="container mx-auto px-4 mt-12 md:mt-20">
+      <div className="flex justify-between items-center mb-10">
+        <div className="relative">
+          <h2 className="text-2xl md:text-3xl font-black text-gray-900 leading-none">Deal of The Day</h2>
+          <div className="absolute -bottom-3 left-0 w-16 h-1 bg-[#E91E63] rounded-full"></div>
         </div>
-        <button className="flex items-center gap-1 text-blue-600 font-semibold hover:gap-2 transition-all text-sm">
-          View All <ChevronRight className="w-4 h-4 bg-blue-600 text-white rounded-md p-0.5" />
+        <button className="flex items-center gap-2 text-[#00AEEF] font-black hover:text-[#E91E63] transition-all text-sm uppercase tracking-widest group">
+          View All Deals <ChevronRight className="w-6 h-6 bg-[#00AEEF] group-hover:bg-[#E91E63] text-white rounded-full p-1" />
         </button>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 md:gap-4">
-        {[...products].reverse().map(product => (
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-6 md:gap-8">
+        {[...products].reverse().slice(0, 5).map(product => (
           <ProductCard 
             key={product.id} 
             product={product} 

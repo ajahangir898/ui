@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, Suspense, lazy, useMemo } from 'react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import Header from './components/Header.tsx';
 import Hero from './components/Hero.tsx';
 import Categories from './components/Categories.tsx';
@@ -11,7 +12,8 @@ import TrustSection from './components/TrustSection.tsx';
 import SpecialOffer from './components/SpecialOffer.tsx';
 import LoadingFallback from './components/LoadingFallback.tsx';
 import FloatingCart from './components/FloatingCart.tsx';
-import { fetchSiteConfig, fetchProducts } from './api.ts';
+import ProductCard from './components/ProductCard.tsx';
+import { DatabaseService } from './api.ts';
 import { Product, SiteConfig } from './types.ts';
 
 const ProductView = lazy(() => import('./components/ProductView.tsx'));
@@ -34,9 +36,11 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // Cart State
-  const [cart, setCart] = useState<CartItem[]>([]);
+  // Smart Discovery State
+  const [smartPicks, setSmartPicks] = useState<{ products: Product[], reasoning: string } | null>(null);
+  const [isDiscovering, setIsDiscovering] = useState(false);
 
+  const [cart, setCart] = useState<CartItem[]>([]);
   const totalItems = useMemo(() => cart.reduce((sum, item) => sum + item.quantity, 0), [cart]);
   const totalPrice = useMemo(() => cart.reduce((sum, item) => sum + (item.price * item.quantity), 0), [cart]);
 
@@ -44,15 +48,21 @@ function App() {
     async function loadData() {
       try {
         const [configData, productData] = await Promise.all([
-          fetchSiteConfig(),
-          fetchProducts()
+          DatabaseService.fetchConfig(),
+          DatabaseService.fetchAllProducts()
         ]);
         setConfig(configData);
         setProducts(productData);
+        
+        // Initial Smart Discovery
+        setIsDiscovering(true);
+        const picks = await DatabaseService.getSmartSuggestions("trending premium baby essentials");
+        setSmartPicks(picks);
       } catch (error) {
-        console.error("Failed to fetch dashboard config", error);
+        console.error("Data load error:", error);
       } finally {
         setLoading(false);
+        setIsDiscovering(false);
       }
     }
     loadData();
@@ -102,13 +112,39 @@ function App() {
       <main className="flex-grow">
         <Suspense fallback={<LoadingFallback />}>
           {view === 'home' && config && (
-            <div className="animate-in fade-in duration-500 space-y-8 md:space-y-12">
+            <div className="animate-in fade-in duration-500 space-y-12 md:space-y-20 pb-20">
               <Hero slides={config.heroSlides} />
-              <div className="space-y-6 md:space-y-10">
+              
+              <div className="space-y-10">
                 <Categories 
                   categories={config.categories} 
                   onViewAll={() => setView('category')}
                 />
+
+                {/* AI Smart Discovery Section */}
+                <section className="container mx-auto px-4 mt-8">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div className="relative">
+                      <h2 className="text-2xl md:text-3xl font-black text-gray-900 flex items-center gap-3">
+                        <div className="bg-gradient-to-br from-blue-500 to-pink-500 p-2 rounded-2xl">
+                          <Sparkles className="w-5 h-5 text-white" />
+                        </div>
+                        AI Smart Picks
+                      </h2>
+                      <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mt-2 ml-14">Personalized by our AI database</p>
+                    </div>
+                    {isDiscovering && <div className="flex items-center gap-2 text-blue-500 font-bold text-sm"><Loader2 className="w-4 h-4 animate-spin" /> Analyzing trends...</div>}
+                  </div>
+
+                  {smartPicks && (
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                      {smartPicks.products.map(p => (
+                        <ProductCard key={p.id} product={p} onClick={() => navigateToProduct(p)} onAddToCart={handleAddToCart} />
+                      ))}
+                    </div>
+                  )}
+                </section>
+
                 <FlashSale 
                   products={products} 
                   initialTime={config.flashSaleTime} 
@@ -116,8 +152,11 @@ function App() {
                   onAddToCart={handleAddToCart}
                 />
               </div>
+
               <SpecialOffer config={config.specialOffer} />
+              
               <DealOfTheDay products={products} onProductClick={navigateToProduct} onAddToCart={handleAddToCart} />
+              
               <TrustSection items={config.trustItems} />
             </div>
           )}

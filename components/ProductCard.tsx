@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Heart, Star, ShoppingCart, TrendingUp } from 'lucide-react';
-import { Product } from '../types';
+import { Product } from '../types.ts';
 
 interface ProductCardProps {
   product: Product;
@@ -13,6 +13,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick, onAddToCart
   const handleAdd = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (onAddToCart) onAddToCart(product);
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onClick) onClick();
   };
 
   return (
@@ -97,13 +102,13 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick, onAddToCart
           {/* Action Buttons */}
           <div className="flex gap-1.5 md:gap-2">
             <button 
-              onClick={handleAdd}
-              className="flex-1 bg-gray-900 hover:bg-pink-600 text-white font-black py-2.5 md:py-3 text-[10px] md:text-sm transition-all active:scale-95 shadow-lg shadow-gray-200 hover:shadow-pink-100 uppercase tracking-widest rounded-none"
+              onClick={handleBuyNow}
+              className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-black py-2.5 md:py-3 text-[10px] md:text-sm transition-all active:scale-95 shadow-lg shadow-pink-100 uppercase tracking-widest rounded-none"
             >
-              Add To Cart
+              Buy Now
             </button>
             <button 
-              className="w-10 md:w-12 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-blue-100 group/cart rounded-none" 
+              className="w-10 md:w-12 bg-[#00AEEF] hover:bg-blue-600 text-white flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-blue-100 group/cart rounded-none" 
               onClick={handleAdd}
             >
               <ShoppingCart className="w-5 h-5 md:w-6 h-6 group-hover/cart:animate-bounce" />

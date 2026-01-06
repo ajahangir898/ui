@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Product, Category } from './types';
+import { Product, Category } from './types.ts';
 
 export const COLORS = {
   primary: '#e91e63', // Pink/Magenta
@@ -26,7 +26,13 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'p1',
     name: 'Aveeno Baby Calming Comfort Lotion 150 ml',
     description: 'The Aveeno Baby calming lotion soothes delicate skin gently. The...',
-    image: 'https://picsum.photos/seed/aveeno/400/400',
+    image: 'https://picsum.photos/seed/aveeno1/400/400',
+    images: [
+      'https://picsum.photos/seed/aveeno1/400/400',
+      'https://picsum.photos/seed/aveeno2/400/400',
+      'https://picsum.photos/seed/aveeno3/400/400',
+      'https://picsum.photos/seed/aveeno4/400/400',
+    ],
     price: 1480,
     oldPrice: 2100,
     rating: 0,
@@ -38,7 +44,12 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'p2',
     name: 'Meril Baby Gel Strawberry Toothpaste',
     description: 'Meril Baby Gel Strawberry Toothpaste 45 gm is a gentle, fluoride-free...',
-    image: 'https://picsum.photos/seed/toothpaste/400/400',
+    image: 'https://picsum.photos/seed/toothpaste1/400/400',
+    images: [
+      'https://picsum.photos/seed/toothpaste1/400/400',
+      'https://picsum.photos/seed/toothpaste2/400/400',
+      'https://picsum.photos/seed/toothpaste3/400/400',
+    ],
     price: 100,
     rating: 0,
     soldCount: 0,
@@ -49,7 +60,11 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'p3',
     name: 'Pepsodent Awesome Orange Toothpaste',
     description: 'Your kids will love the gentle formula of Pepsodent Kids Sweet Strawberry...',
-    image: 'https://picsum.photos/seed/pepso/400/400',
+    image: 'https://picsum.photos/seed/pepso1/400/400',
+    images: [
+      'https://picsum.photos/seed/pepso1/400/400',
+      'https://picsum.photos/seed/pepso2/400/400',
+    ],
     price: 88,
     oldPrice: 90,
     rating: 0,
@@ -61,7 +76,12 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'p4',
     name: 'Mum Mum Pant System Baby Diaper Pant (M Size)',
     description: 'Our Baby deserves the softest touch like that of a mother. Mum-Mum Baby...',
-    image: 'https://picsum.photos/seed/diaper/400/400',
+    image: 'https://picsum.photos/seed/diaper1/400/400',
+    images: [
+      'https://picsum.photos/seed/diaper1/400/400',
+      'https://picsum.photos/seed/diaper2/400/400',
+      'https://picsum.photos/seed/diaper3/400/400',
+    ],
     price: 105,
     oldPrice: 140,
     rating: 0,
@@ -73,7 +93,12 @@ export const MOCK_PRODUCTS: Product[] = [
     id: 'p5',
     name: 'Neocare Premium Belt System Baby Diaper (XL Size)',
     description: 'The Neocare Premium Belt System Baby Diaper is a helpful product. This...',
-    image: 'https://picsum.photos/seed/neo/400/400',
+    image: 'https://picsum.photos/seed/neo1/400/400',
+    images: [
+      'https://picsum.photos/seed/neo1/400/400',
+      'https://picsum.photos/seed/neo2/400/400',
+      'https://picsum.photos/seed/neo3/400/400',
+    ],
     price: 1510,
     oldPrice: 1950,
     rating: 0,

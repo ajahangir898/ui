@@ -1,6 +1,6 @@
 
-import { SiteConfig, Product } from './types';
-import { MOCK_PRODUCTS, CATEGORIES } from './constants';
+import { SiteConfig, Product } from './types.ts';
+import { MOCK_PRODUCTS, CATEGORIES } from './constants.tsx';
 
 export const fetchSiteConfig = async (): Promise<SiteConfig> => {
   // Simulate API Delay
@@ -43,4 +43,14 @@ export const fetchSiteConfig = async (): Promise<SiteConfig> => {
 export const fetchProducts = async (): Promise<Product[]> => {
   await new Promise(resolve => setTimeout(resolve, 1000));
   return MOCK_PRODUCTS;
+};
+
+export const fetchRelatedProducts = async (productId: string): Promise<Product[]> => {
+  await new Promise(resolve => setTimeout(resolve, 600));
+  // In a real app, you'd filter by category. For mock, we'll just exclude the current product
+  // and pick a random subset to simulate dynamic relevance.
+  return MOCK_PRODUCTS
+    .filter(p => p.id !== productId)
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 5);
 };

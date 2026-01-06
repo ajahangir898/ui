@@ -1,6 +1,6 @@
 
 import React from 'react';
-import Skeleton from './Skeleton';
+import Skeleton from './Skeleton.tsx';
 
 const LoadingFallback: React.FC = () => {
   return (

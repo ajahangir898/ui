@@ -1,13 +1,15 @@
 
-import React, { useState } from 'react';
-import { Star, Heart, Plus, Minus, ShoppingCart, CheckCircle, MessageSquare, ChevronRight } from 'lucide-react';
-import { Product } from '../types';
-import { MOCK_PRODUCTS } from '../constants';
+import React, { useState, useEffect } from 'react';
+import { Star, Heart, Plus, Minus, ShoppingCart, CheckCircle, MessageSquare, ChevronRight, Sparkles, ChevronLeft } from 'lucide-react';
+import { Product } from '../types.ts';
+import { fetchRelatedProducts } from '../api.ts';
+import Skeleton from './Skeleton.tsx';
 
 interface ProductViewProps {
   product: Product;
   onBuyNow: () => void;
   onAddToCart: () => void;
+  onProductClick: (product: Product) => void;
 }
 
 const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -18,14 +20,44 @@ const COLORS = [
   { name: 'Yellow', class: 'bg-yellow-400 border-yellow-500' }
 ];
 
-const ProductView: React.FC<ProductViewProps> = ({ product, onBuyNow, onAddToCart }) => {
+const ProductView: React.FC<ProductViewProps> = ({ product, onBuyNow, onAddToCart, onProductClick }) => {
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState('description');
   const [selectedSize, setSelectedSize] = useState('L');
   const [selectedColor, setSelectedColor] = useState('White');
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [isLoadingRelated, setIsLoadingRelated] = useState(true);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  const handleAddToCart = () => {
-    onAddToCart();
+  // Safely get gallery images, fallback to primary image if none provided
+  const galleryImages = product.images && product.images.length > 0 
+    ? product.images 
+    : [product.image];
+
+  useEffect(() => {
+    // Reset image index when product changes
+    setActiveImageIndex(0);
+    
+    const getRelated = async () => {
+      setIsLoadingRelated(true);
+      try {
+        const items = await fetchRelatedProducts(product.id);
+        setRelatedProducts(items);
+      } catch (err) {
+        console.error("Failed to load related products", err);
+      } finally {
+        setIsLoadingRelated(false);
+      }
+    };
+    getRelated();
+  }, [product.id]);
+
+  const handleNextImage = () => {
+    setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
+  };
+
+  const handlePrevImage = () => {
+    setActiveImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
   };
 
   return (
@@ -33,30 +65,71 @@ const ProductView: React.FC<ProductViewProps> = ({ product, onBuyNow, onAddToCar
       <div className="container mx-auto px-4 py-2 md:py-4">
         {/* Breadcrumbs */}
         <nav className="flex items-center gap-1 text-[9px] md:text-xs text-gray-500 mb-3 md:mb-5 overflow-x-auto whitespace-nowrap pb-1">
-          <span className="hover:text-blue-500 cursor-pointer">Home</span>
+          <span className="hover:text-blue-500 cursor-pointer" onClick={() => window.location.reload()}>Home</span>
           <ChevronRight className="w-2.5 h-2.5" />
           <span className="font-bold text-gray-800 truncate max-w-[120px] md:max-w-none">{product.name}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
-          {/* Left: Product Images */}
-          <div className="lg:col-span-5">
-            <div className="bg-white p-3 md:p-6 relative shadow-sm border border-gray-100 rounded-none">
+          {/* Left: Product Gallery */}
+          <div className="lg:col-span-5 space-y-4">
+            <div className="bg-white p-3 md:p-6 relative shadow-sm border border-gray-100 rounded-none group overflow-hidden">
               {product.oldPrice && (
-                <span className="absolute top-3 left-3 bg-blue-100 text-blue-600 text-[8px] md:text-[10px] font-bold px-2 py-0.5 rounded-none">
+                <span className="absolute top-3 left-3 bg-blue-100 text-blue-600 text-[8px] md:text-[10px] font-bold px-2 py-0.5 z-10 rounded-none">
                   -{Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}% OFF
                 </span>
               )}
-              <button className="absolute top-3 right-3 text-blue-500 hover:scale-110 transition-transform">
+              <button className="absolute top-3 right-3 text-blue-500 hover:scale-110 transition-transform z-10">
                 <Heart className="w-5 h-5" />
               </button>
-              <img 
-                src={product.image} 
-                alt={product.name} 
-                className="w-full aspect-square object-contain mx-auto max-w-[240px] md:max-w-full rounded-none"
-                loading="lazy"
-              />
+              
+              {/* Main Image View */}
+              <div className="relative aspect-square flex items-center justify-center">
+                <img 
+                  src={galleryImages[activeImageIndex]} 
+                  alt={`${product.name} - View ${activeImageIndex + 1}`} 
+                  className="w-full h-full object-contain mx-auto transition-all duration-500 ease-out"
+                  loading="lazy"
+                />
+                
+                {/* Navigation Arrows (Only if multiple images) */}
+                {galleryImages.length > 1 && (
+                  <>
+                    <button 
+                      onClick={handlePrevImage}
+                      className="absolute left-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity rounded-none"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-gray-800" />
+                    </button>
+                    <button 
+                      onClick={handleNextImage}
+                      className="absolute right-0 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 shadow-md opacity-0 group-hover:opacity-100 transition-opacity rounded-none"
+                    >
+                      <ChevronRight className="w-5 h-5 text-gray-800" />
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
+
+            {/* Thumbnails */}
+            {galleryImages.length > 1 && (
+              <div className="flex gap-2 md:gap-3 overflow-x-auto no-scrollbar pb-2">
+                {galleryImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-white border-2 p-1 transition-all rounded-none ${
+                      activeImageIndex === idx 
+                      ? 'border-blue-500 shadow-lg shadow-blue-50' 
+                      : 'border-slate-100 hover:border-blue-200'
+                    }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-contain" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Center: Product Details */}
@@ -147,7 +220,7 @@ const ProductView: React.FC<ProductViewProps> = ({ product, onBuyNow, onAddToCar
               </div>
               <div className="flex gap-2 flex-grow">
                 <button 
-                  onClick={handleAddToCart}
+                  onClick={onAddToCart}
                   className="flex-1 bg-gray-900 hover:bg-pink-600 text-white h-12 px-4 font-black flex items-center justify-center gap-2 transition-all active:scale-95 text-[11px] md:text-xs uppercase tracking-widest rounded-none"
                 >
                   <ShoppingCart className="w-4 h-4" /> Add To Cart
@@ -170,26 +243,61 @@ const ProductView: React.FC<ProductViewProps> = ({ product, onBuyNow, onAddToCar
             </div>
           </div>
 
-          {/* Right: Related Products */}
+          {/* Right: Enhanced Related Products */}
           <div className="lg:col-span-3">
-            <div className="bg-white p-3 md:p-5 shadow-sm border border-gray-100 rounded-none">
+            <div className="bg-white p-3 md:p-5 shadow-sm border border-gray-100 rounded-none sticky top-24">
               <h2 className="text-sm md:text-base font-black text-gray-900 mb-4 flex items-center gap-2 uppercase tracking-widest">
-                Related
-                <div className="h-1 flex-1 bg-blue-500 ml-2" />
+                <Sparkles className="w-4 h-4 text-blue-500" />
+                Smart Picks
+                <div className="h-0.5 flex-1 bg-slate-100 ml-2" />
               </h2>
-              <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-1 no-scrollbar lg:space-y-4">
-                {MOCK_PRODUCTS.slice(0, 4).map((item) => (
-                  <div key={item.id} className="flex gap-3 group cursor-pointer flex-shrink-0 w-40 lg:w-full">
-                    <div className="w-12 h-12 bg-slate-50 p-2 flex-shrink-0 border border-slate-100 rounded-none group-hover:border-blue-200 transition-colors">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-contain rounded-none" loading="lazy" />
+              
+              <div className="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible pb-1 no-scrollbar lg:space-y-5">
+                {isLoadingRelated ? (
+                  // Related Skeletons
+                  [...Array(4)].map((_, i) => (
+                    <div key={i} className="flex gap-3 flex-shrink-0 w-40 lg:w-full">
+                      <Skeleton className="w-14 h-14 rounded-none flex-shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-3 w-full rounded-none" />
+                        <Skeleton className="h-3 w-1/2 rounded-none" />
+                      </div>
                     </div>
-                    <div className="min-w-0 flex flex-col justify-center">
-                      <h4 className="text-[10px] md:text-[11px] font-black text-gray-800 truncate group-hover:text-blue-600 transition-colors uppercase tracking-tight">{item.name}</h4>
-                      <p className="text-pink-600 font-black text-[10px] md:text-xs mt-0.5">৳ {item.price.toLocaleString()}</p>
+                  ))
+                ) : (
+                  relatedProducts.map((item) => (
+                    <div 
+                      key={item.id} 
+                      onClick={() => onProductClick(item)}
+                      className="flex gap-4 group cursor-pointer flex-shrink-0 w-48 lg:w-full items-center p-2 hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100 rounded-none"
+                    >
+                      <div className="w-14 h-14 bg-white p-2 flex-shrink-0 border border-slate-100 rounded-none group-hover:border-blue-300 transition-all shadow-sm">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-contain rounded-none group-hover:scale-110 transition-transform" loading="lazy" />
+                      </div>
+                      <div className="min-w-0 flex flex-col justify-center">
+                        <h4 className="text-[10px] md:text-[11px] font-black text-gray-700 truncate group-hover:text-blue-600 transition-colors uppercase tracking-tight leading-tight mb-1">{item.name}</h4>
+                        <div className="flex items-center gap-2">
+                          <span className="text-pink-600 font-black text-[11px] md:text-xs">৳ {item.price.toLocaleString()}</span>
+                          {item.oldPrice && <span className="text-[9px] text-gray-300 line-through">৳{item.oldPrice}</span>}
+                        </div>
+                      </div>
                     </div>
+                  ))
+                )}
+
+                {!isLoadingRelated && relatedProducts.length === 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No more matches</p>
                   </div>
-                ))}
+                )}
               </div>
+
+              <button 
+                onClick={() => window.scrollTo(0, 0)}
+                className="hidden lg:flex w-full mt-6 py-2 border-2 border-slate-50 hover:bg-slate-50 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 items-center justify-center gap-2 transition-all rounded-none"
+              >
+                Back To Top
+              </button>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { CheckCircle2, Package, Calendar, ArrowRight } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 
 interface OrderConfirmedProps {
   onContinue: () => void;
@@ -8,45 +8,43 @@ interface OrderConfirmedProps {
 
 const OrderConfirmed: React.FC<OrderConfirmedProps> = ({ onContinue }) => {
   return (
-    <div className="bg-slate-50 min-h-screen py-20">
-      <div className="container mx-auto px-4 flex flex-col items-center">
-        <div className="bg-white p-12 shadow-2xl shadow-blue-100 max-w-2xl w-full text-center border-b-[8px] border-blue-500 rounded-none">
-          <div className="w-24 h-24 bg-green-100 flex items-center justify-center mx-auto mb-8 animate-bounce rounded-none">
-            <CheckCircle2 className="w-14 h-14 text-green-500" />
+    <div className="bg-[#f8fafc] min-h-screen flex items-center justify-center p-4 font-['Inter']">
+      <div className="bg-white p-10 md:p-16 shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-gray-100 max-w-lg w-full text-center rounded-xl animate-in fade-in zoom-in duration-500">
+        
+        {/* Success Icon */}
+        <div className="flex justify-center mb-10">
+          <div className="w-20 h-20 bg-[#3ecf8e] flex items-center justify-center rounded-full shadow-lg shadow-green-100">
+            <Check className="w-10 h-10 text-white stroke-[3px]" />
           </div>
-          
-          <h1 className="text-4xl font-black text-gray-900 mb-4 tracking-tight">Woohoo! Order Placed!</h1>
-          <p className="text-gray-500 text-lg mb-10">We've received your order and we're starting to pack it with love. You'll receive a confirmation SMS shortly.</p>
-          
-          <div className="grid grid-cols-2 gap-4 mb-10">
-            <div className="bg-slate-50 p-6 border border-dashed border-slate-200 rounded-none">
-              <div className="flex items-center gap-2 text-blue-500 font-black uppercase text-[10px] tracking-widest mb-2 justify-center">
-                <Package className="w-3 h-3" /> Order ID
-              </div>
-              <div className="text-xl font-black text-gray-800">#CK-92834</div>
-            </div>
-            <div className="bg-slate-50 p-6 border border-dashed border-slate-200 rounded-none">
-              <div className="flex items-center gap-2 text-pink-500 font-black uppercase text-[10px] tracking-widest mb-2 justify-center">
-                <Calendar className="w-3 h-3" /> Est. Delivery
-              </div>
-              <div className="text-xl font-black text-gray-800">Dec 14-16</div>
-            </div>
-          </div>
+        </div>
 
+        {/* Text Content */}
+        <div className="space-y-4 mb-10">
+          <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-900">
+            Thank You
+          </h4>
+          <h1 className="text-2xl md:text-3xl font-black text-gray-900 uppercase tracking-tight">
+            Your Order is Placed
+          </h1>
+          <p className="text-gray-500 text-sm md:text-base leading-relaxed px-4">
+            We received your order and will begin processing it soon. Your order information appears below.
+          </p>
+          <p className="text-gray-800 font-medium text-lg pt-2">
+            Your order Number <span className="font-bold text-gray-900">#0004</span>
+          </p>
+        </div>
+
+        {/* Action Button */}
+        <div className="flex justify-center">
           <button 
             onClick={onContinue}
-            className="group inline-flex items-center gap-3 bg-gray-900 hover:bg-blue-600 text-white px-10 py-5 font-black text-lg transition-all shadow-xl hover:shadow-blue-200 active:scale-95 rounded-none"
+            className="group inline-flex items-center gap-2 bg-[#3ecf8e] hover:bg-green-600 text-white px-8 py-3.5 font-bold text-sm transition-all active:scale-95 shadow-lg shadow-green-100 rounded-lg"
           >
-            Continue Shopping
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            View Order
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
 
-        <div className="mt-12 text-center text-gray-400 font-bold text-sm uppercase tracking-widest flex items-center gap-4">
-          <span className="w-12 h-px bg-slate-200"></span>
-          Trusted by 50,000+ Happy Moms
-          <span className="w-12 h-px bg-slate-200"></span>
-        </div>
       </div>
     </div>
   );

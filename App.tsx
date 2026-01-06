@@ -1,23 +1,24 @@
 
 import React, { useState, useEffect, Suspense, lazy, useMemo } from 'react';
-import Header from './components/Header';
-import Hero from './components/Hero';
-import Categories from './components/Categories';
-import FlashSale from './components/FlashSale';
-import DealOfTheDay from './components/DealOfTheDay';
-import Footer from './components/Footer';
-import MobileBottomNav from './components/MobileBottomNav';
-import TrustSection from './components/TrustSection';
-import SpecialOffer from './components/SpecialOffer';
-import LoadingFallback from './components/LoadingFallback';
-import FloatingCart from './components/FloatingCart';
-import { fetchSiteConfig, fetchProducts } from './api';
-import { Product, SiteConfig } from './types';
+import Header from './components/Header.tsx';
+import Hero from './components/Hero.tsx';
+import Categories from './components/Categories.tsx';
+import FlashSale from './components/FlashSale.tsx';
+import DealOfTheDay from './components/DealOfTheDay.tsx';
+import Footer from './components/Footer.tsx';
+import MobileBottomNav from './components/MobileBottomNav.tsx';
+import TrustSection from './components/TrustSection.tsx';
+import SpecialOffer from './components/SpecialOffer.tsx';
+import LoadingFallback from './components/LoadingFallback.tsx';
+import FloatingCart from './components/FloatingCart.tsx';
+import { fetchSiteConfig, fetchProducts } from './api.ts';
+import { Product, SiteConfig } from './types.ts';
 
-const ProductView = lazy(() => import('./components/ProductView'));
-const Checkout = lazy(() => import('./components/Checkout'));
-const OrderConfirmed = lazy(() => import('./components/OrderConfirmed'));
-const SearchView = lazy(() => import('./components/SearchView'));
+const ProductView = lazy(() => import('./components/ProductView.tsx'));
+const Checkout = lazy(() => import('./components/Checkout.tsx'));
+const OrderConfirmed = lazy(() => import('./components/OrderConfirmed.tsx'));
+const SearchView = lazy(() => import('./components/SearchView.tsx'));
+const CategoryView = lazy(() => import('./components/CategoryView.tsx'));
 
 interface CartItem {
   id: string;
@@ -26,7 +27,7 @@ interface CartItem {
 }
 
 function App() {
-  const [view, setView] = useState<'home' | 'product' | 'checkout' | 'success' | 'search'>('home');
+  const [view, setView] = useState<'home' | 'product' | 'checkout' | 'success' | 'search' | 'category'>('home');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [config, setConfig] = useState<SiteConfig | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -104,7 +105,10 @@ function App() {
             <div className="animate-in fade-in duration-500 space-y-8 md:space-y-12">
               <Hero slides={config.heroSlides} />
               <div className="space-y-6 md:space-y-10">
-                <Categories categories={config.categories} />
+                <Categories 
+                  categories={config.categories} 
+                  onViewAll={() => setView('category')}
+                />
                 <FlashSale 
                   products={products} 
                   initialTime={config.flashSaleTime} 
@@ -128,11 +132,22 @@ function App() {
             />
           )}
 
+          {view === 'category' && (
+            <CategoryView 
+              allProducts={products}
+              categories={config?.categories || []}
+              onProductClick={navigateToProduct}
+              onAddToCart={handleAddToCart}
+              onBack={navigateToHome}
+            />
+          )}
+
           {view === 'product' && selectedProduct && (
             <ProductView 
               product={selectedProduct} 
               onBuyNow={() => setView('checkout')} 
               onAddToCart={() => handleAddToCart(selectedProduct)}
+              onProductClick={navigateToProduct}
             />
           )}
 
@@ -145,6 +160,7 @@ function App() {
               onBack={navigateToHome} 
               cartItems={cart}
               totalPrice={totalPrice}
+              allProducts={products}
             />
           )}
 

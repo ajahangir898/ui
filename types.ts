@@ -4,13 +4,15 @@ export interface Product {
   name: string;
   description: string;
   image: string;
-  images?: string[]; // Added support for multiple images
+  images?: string[];
   price: number;
   oldPrice?: number;
   rating: number;
   soldCount: number;
   coinsReward: number;
   isSale: boolean;
+  brand?: string;
+  tags?: string[];
 }
 
 export interface Category {

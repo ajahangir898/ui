@@ -8,9 +8,10 @@ interface FlashSaleProps {
   products: Product[];
   initialTime: { h: number; m: number; s: number };
   onProductClick: (product: Product) => void;
+  onAddToCart?: (product: Product) => void;
 }
 
-const FlashSale: React.FC<FlashSaleProps> = ({ products, initialTime, onProductClick }) => {
+const FlashSale: React.FC<FlashSaleProps> = ({ products, initialTime, onProductClick, onAddToCart }) => {
   const [timeLeft, setTimeLeft] = useState(initialTime);
 
   useEffect(() => {
@@ -52,7 +53,12 @@ const FlashSale: React.FC<FlashSaleProps> = ({ products, initialTime, onProductC
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-6">
         {products.map(product => (
-          <ProductCard key={product.id} product={product} onClick={() => onProductClick(product)} />
+          <ProductCard 
+            key={product.id} 
+            product={product} 
+            onClick={() => onProductClick(product)} 
+            onAddToCart={onAddToCart}
+          />
         ))}
       </div>
     </section>

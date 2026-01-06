@@ -5,11 +5,16 @@ import { ChevronLeft, ShieldCheck, Truck, CreditCard } from 'lucide-react';
 interface CheckoutProps {
   onConfirm: () => void;
   onBack: () => void;
+  cartItems: any[];
+  totalPrice: number;
 }
 
-const Checkout: React.FC<CheckoutProps> = ({ onConfirm, onBack }) => {
+const Checkout: React.FC<CheckoutProps> = ({ onConfirm, onBack, cartItems, totalPrice }) => {
+  const shippingFee = cartItems.length > 0 ? 60 : 0;
+  const grandTotal = totalPrice + shippingFee;
+
   return (
-    <div className="bg-slate-50 min-h-screen py-10">
+    <div className="bg-slate-50 min-h-screen py-10 font-['Inter']">
       <div className="container mx-auto px-4">
         <button 
           onClick={onBack}
@@ -79,22 +84,23 @@ const Checkout: React.FC<CheckoutProps> = ({ onConfirm, onBack }) => {
               <div className="space-y-4 mb-8">
                 <div className="flex justify-between text-gray-500">
                   <span className="font-medium">Subtotal</span>
-                  <span className="font-bold">৳ 1,280</span>
+                  <span className="font-bold">৳ {totalPrice.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span className="font-medium">Shipping Fee</span>
-                  <span className="font-bold">৳ 60</span>
+                  <span className="font-bold">৳ {shippingFee}</span>
                 </div>
                 <div className="h-px bg-slate-100 my-4" />
                 <div className="flex justify-between text-gray-900 text-xl font-black">
                   <span>Total</span>
-                  <span className="text-blue-600">৳ 1,340</span>
+                  <span className="text-blue-600">৳ {grandTotal.toLocaleString()}</span>
                 </div>
               </div>
               
               <button 
                 onClick={onConfirm}
-                className="w-full bg-pink-500 hover:bg-pink-600 text-white py-4 font-black text-lg shadow-lg shadow-pink-200 transition-all active:scale-95 mb-6 rounded-none"
+                disabled={cartItems.length === 0}
+                className="w-full bg-pink-500 hover:bg-pink-600 disabled:bg-gray-200 text-white py-4 font-black text-lg shadow-lg shadow-pink-200 transition-all active:scale-95 mb-6 rounded-none"
               >
                 Place Order Now
               </button>

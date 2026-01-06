@@ -6,15 +6,21 @@ import { Product } from '../types';
 interface ProductCardProps {
   product: Product;
   onClick?: () => void;
+  onAddToCart?: (product: Product) => void;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onClick, onAddToCart }) => {
+  const handleAdd = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onAddToCart) onAddToCart(product);
+  };
+
   return (
     <div 
       className="group bg-white border border-gray-100/50 overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] transition-all duration-500 flex flex-col h-full relative p-2 md:p-4 cursor-pointer isolate rounded-none"
       onClick={onClick}
     >
-      {/* Dynamic Badge - Percentage Off calculation if available */}
+      {/* Dynamic Badge */}
       {product.oldPrice && product.isSale && (
         <div className="absolute top-3 left-3 z-20 flex flex-col gap-0.5">
           <span className="bg-pink-500 text-white text-[9px] md:text-[10px] font-black px-2 py-0.5 shadow-lg shadow-pink-200 rounded-none">
@@ -90,12 +96,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onClick }) => {
 
           {/* Action Buttons */}
           <div className="flex gap-1.5 md:gap-2">
-            <button className="flex-1 bg-gray-900 hover:bg-pink-600 text-white font-black py-2.5 md:py-3 text-[10px] md:text-sm transition-all active:scale-95 shadow-lg shadow-gray-200 hover:shadow-pink-100 uppercase tracking-widest rounded-none">
+            <button 
+              onClick={handleAdd}
+              className="flex-1 bg-gray-900 hover:bg-pink-600 text-white font-black py-2.5 md:py-3 text-[10px] md:text-sm transition-all active:scale-95 shadow-lg shadow-gray-200 hover:shadow-pink-100 uppercase tracking-widest rounded-none"
+            >
               Add To Cart
             </button>
             <button 
               className="w-10 md:w-12 bg-blue-500 hover:bg-blue-600 text-white flex items-center justify-center transition-all active:scale-95 shadow-lg shadow-blue-100 group/cart rounded-none" 
-              onClick={(e) => e.stopPropagation()}
+              onClick={handleAdd}
             >
               <ShoppingCart className="w-5 h-5 md:w-6 h-6 group-hover/cart:animate-bounce" />
             </button>

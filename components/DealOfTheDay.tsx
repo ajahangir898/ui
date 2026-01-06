@@ -7,9 +7,10 @@ import { Product } from '../types';
 interface DealOfTheDayProps {
   products: Product[];
   onProductClick: (product: Product) => void;
+  onAddToCart?: (product: Product) => void;
 }
 
-const DealOfTheDay: React.FC<DealOfTheDayProps> = ({ products, onProductClick }) => {
+const DealOfTheDay: React.FC<DealOfTheDayProps> = ({ products, onProductClick, onAddToCart }) => {
   return (
     <section className="container mx-auto mt-4 px-4">
       <div className="flex justify-between items-end mb-3 md:mb-5">
@@ -22,7 +23,12 @@ const DealOfTheDay: React.FC<DealOfTheDayProps> = ({ products, onProductClick })
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 md:gap-4">
         {[...products].reverse().map(product => (
-          <ProductCard key={product.id} product={product} onClick={() => onProductClick(product)} />
+          <ProductCard 
+            key={product.id} 
+            product={product} 
+            onClick={() => onProductClick(product)} 
+            onAddToCart={onAddToCart}
+          />
         ))}
       </div>
     </section>
